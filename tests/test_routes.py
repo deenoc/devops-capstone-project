@@ -173,4 +173,33 @@ class TestAccountService(TestCase):
         fake_id = 99999
         response = self.client.delete(f"{BASE_URL}/{fake_id}")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        
+
+    def test_get_account(self):
+        """It should Read a single Account"""
+        account = self._create_accounts(1)[0]
+        resp = self.client.get(
+            f"{BASE_URL}/{account.id}", content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["name"], account.name)
+
+    def test_update_wrong_media_type(self):
+        """It should return 415 UNSUPPORTED_MEDIA_TYPE on update"""
+        account = self._create_accounts(1)[0]
+        response = self.client.put(
+            f"{BASE_URL}/{account.id}",
+            data="not json",
+            content_type="text/html"
+        )
+        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+######################################################################
+# TEST AN ACCOUNT NOT FOUND
+######################################################################
+
+    def test_get_account_not_found(self):
+        """It should not Read an Account that is not found"""
+        resp = self.client.get(f"{BASE_URL}/0")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+

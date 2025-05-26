@@ -75,13 +75,16 @@ def list_accounts():
 ######################################################################
 
 @app.route("/accounts/<int:account_id>", methods=["GET"])
-def get_account(account_id):
-    """Read an account"""
-    app.logger.info("Request to read Account with id: %s", account_id)
+def get_accounts(account_id):
+    """
+    Reads an Account
+    This endpoint will read an Account based the account_id that is requested
+    """
+    app.logger.info("Request to read an Account with id: %s", account_id)
     account = Account.find(account_id)
     if not account:
-        abort(status.HTTP_404_NOT_FOUND, f"Account with id {account_id} not found.")
-    return jsonify(account.serialize()), status.HTTP_200_OK
+        abort(status.HTTP_404_NOT_FOUND, f"Account with id [{account_id}] could not be found.")
+    return account.serialize(), status.HTTP_200_OK
 
 
 ######################################################################
@@ -118,7 +121,6 @@ def delete_account(account_id):
 
     account.delete()
     return "", status.HTTP_204_NO_CONTENT
-
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
