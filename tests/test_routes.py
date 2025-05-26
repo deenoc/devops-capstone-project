@@ -124,3 +124,53 @@ class TestAccountService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     # ADD YOUR TEST CASES HERE ...
+    def test_read_an_account(self):
+        """It should Read an account"""
+        account = self._create_accounts(1)[0]
+        response = self.client.get(f"{BASE_URL}/{account.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(data["name"], account.name)
+
+    def test_list_accounts(self):
+        """It should List all Accounts in the database"""
+        self._create_accounts(3)
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 3)
+
+    def test_update_account(self):
+        """It should Update an account"""
+        account = self._create_accounts(1)[0]
+        updated_data = account.serialize()
+        updated_data["name"] = "Updated Name"
+        response = self.client.put(f"{BASE_URL}/{account.id}", json=updated_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(data["name"], "Updated Name")
+
+    def test_delete_account(self):
+        """It should Delete an account"""
+        account = self._create_accounts(1)[0]
+        response = self.client.delete(f"{BASE_URL}/{account.id}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # Confirm it's gone
+        get_response = self.client.get(f"{BASE_URL}/{account.id}")
+        self.assertEqual(get_response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_nonexistent_account(self):
+        """It should return 404 when updating non-existent account"""
+        fake_id = 99999
+        account = AccountFactory()
+        data = account.serialize()
+        response = self.client.put(f"{BASE_URL}/{fake_id}", json=data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_nonexistent_account(self):
+        """It should return 404 when deleting non-existent account"""
+        fake_id = 99999
+        response = self.client.delete(f"{BASE_URL}/{fake_id}")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        
