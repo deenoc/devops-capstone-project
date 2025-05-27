@@ -35,3 +35,7 @@ except Exception as error:  # pylint: disable=broad-except
     sys.exit(4)
 
 app.logger.info("Service initialized!")
+
+from flask_talisman import Talisman
+
+talisman = Talisman(app)
