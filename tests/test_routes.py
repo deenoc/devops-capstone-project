@@ -1,5 +1,5 @@
 """
-Account API Service Test Suite
+Account API Service Test Suite - Dinu
 
 Test cases can be run with the following:
   nosetests -v --with-spec --spec-color
@@ -113,7 +113,10 @@ class TestAccountService(TestCase):
 
     def test_bad_request(self):
         """It should not Create an Account when sending the wrong data"""
-        response = self.client.post(BASE_URL, json={"name": "not enough data"})
+        response = self.client.post(
+            BASE_URL,
+            json={"name": "not enough data"}
+        )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_unsupported_media_type(self):
@@ -124,13 +127,17 @@ class TestAccountService(TestCase):
             json=account.serialize(),
             content_type="test/html"
         )
-        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     # ADD YOUR TEST CASES HERE ...
     def test_read_an_account(self):
         """It should Read an account"""
         account = self._create_accounts(1)[0]
-        response = self.client.get(f"{BASE_URL}/{account.id}")
+        response = self.client.get(
+            f"{BASE_URL}/{account.id}"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(data["name"], account.name)
@@ -148,7 +155,9 @@ class TestAccountService(TestCase):
         account = self._create_accounts(1)[0]
         updated_data = account.serialize()
         updated_data["name"] = "Updated Name"
-        response = self.client.put(f"{BASE_URL}/{account.id}", json=updated_data)
+        response = self.client.put(
+            f"{BASE_URL}/{account.id}",
+            json=updated_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(data["name"], "Updated Name")
@@ -156,11 +165,15 @@ class TestAccountService(TestCase):
     def test_delete_account(self):
         """It should Delete an account"""
         account = self._create_accounts(1)[0]
-        response = self.client.delete(f"{BASE_URL}/{account.id}")
+        response = self.client.delete(
+            f"{BASE_URL}/{account.id}"
+        )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         # Confirm it's gone
-        get_response = self.client.get(f"{BASE_URL}/{account.id}")
+        get_response = self.client.get(
+            f"{BASE_URL}/{account.id}"
+        )
         self.assertEqual(get_response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_update_nonexistent_account(self):
@@ -195,7 +208,9 @@ class TestAccountService(TestCase):
             data="not json",
             content_type="text/html"
         )
-        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     def test_get_account_not_found(self):
         """It should not Read an Account that is not found"""
@@ -214,17 +229,17 @@ class TestAccountService(TestCase):
         headers = {
             'X-Frame-Options': 'SAMEORIGIN',
             'X-Content-Type-Options': 'nosniff',
-            'Content-Security-Policy': 'default-src \'self\'; object-src \'none\'',
+            'Content-Security-Policy':
+            'default-src \'self\'; object-src \'none\'',
             'Referrer-Policy': 'strict-origin-when-cross-origin'
         }
         for key, value in headers.items():
             self.assertEqual(response.headers.get(key), value)
-    
+
     def test_cors_security(self):
         """It should return a CORS header"""
         response = self.client.get('/', environ_overrides=HTTPS_ENVIRON)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Check for the CORS header
-        self.assertEqual(response.headers.get('Access-Control-Allow-Origin'), '*')
-        
-          
+        self.assertEqual(
+            response.headers.get('Access-Control-Allow-Origin'), '*')
